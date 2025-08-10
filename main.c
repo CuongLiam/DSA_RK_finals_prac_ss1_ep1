@@ -5,36 +5,37 @@
 #define MAX 100
 
 typedef struct Operation {
-    char Action[MAX];
+    char Action;
     char Value;
-
-    struct Operation **data;
-    int top;
 } Operation;
 
-Operation* initOperation(int size) {
-    if (size < 1) {
-        printf("size ko be hon 1");
-        return NULL;
-    }
+typedef struct Stack {
+    Operation data[MAX];
+    int top;
+} Stack;
 
-    Operation* newOperation = malloc(sizeof(Operation));
+Stack* initStack() {
+    Stack* newStack = malloc(sizeof(Stack));
 
-    newOperation->data = malloc(size * sizeof(Operation*));
-    for (int i = 0; i < size; i++) {
-        newOperation->data[i] = malloc(sizeof(char));
-    }
-
-    newOperation->top = -1;
-    return newOperation;
+    newStack->top = -1;
+    return newStack;
 }
 
-void addToOp(Operation* op, char Value) {
-    // ADD
-    op->top++;
-
-
+int isEmpty(Stack* s) {
+    return s->top == -1;
 }
+
+int isFull(Stack* s) {
+    return s->top == MAX - 1;
+}
+
+void push(Stack* s, Operation op) {
+    if (!isFull(s)) {
+        s->top++;
+        s->data[s->top] = op;
+    }
+}
+
 
 void menu() {
     printf("\nMenu practice================");
@@ -46,8 +47,17 @@ void menu() {
     printf("\nur choice....");
 }
 
+void showOp(Stack *s) {
+    for (int i = 0 ; i <= s->top ; i++) {
+        printf("%c", s->data[i].Value);
+    }
+}
+
 int main(void) {
-    Operation* op = initOperation(5);
+    Stack* UNDO = initStack();
+    Stack* REDO = initStack();
+
+
     int choice;
 
     do {
@@ -56,11 +66,26 @@ int main(void) {
         getchar();
         switch (choice) {
             case 1: {
+                char ch;
+                printf("\nNhap ki tu muon them: ");
+                scanf("%c", &ch);
+                getchar();
 
+                if (!isFull(UNDO)) {
+                    Operation op = {'I', ch};
+                    push(UNDO, op);
+                } else {
+                    printf("txt is full");
+                }
                 break;
             }
             case 4: {
-
+                if (isEmpty(UNDO)) {
+                    printf("txt is empty");
+                } else {
+                    printf("txt: ");
+                    showOp(UNDO);
+                }
                 break;
             }
 
@@ -73,6 +98,7 @@ int main(void) {
 
 
 
-    free(op);
+    free(UNDO);
+    free(REDO);
     return 0;
 }
